@@ -1,34 +1,37 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
+    constructor(private readonly usersService: UsersService) {}
+
     @Get()
     findAll(@Query('role') role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
-        return []
+        return this.usersService.findAll(role)
     }
 
-    @Get('interns') // * Good
+    @Get('interns') // ! 在:id之前才能被解析
     findAllInterns() {
-        return []
+        return this.usersService.findAll('INTERN')
     }
 
     @Get(':id') // 读取任何string作为id
     findOne(@Param('id') id: string) {
-        return { id }
+        return this.usersService.findOne(+id)
     }
 
     @Post()
-    create(@Body() user: {}) {
-        return user
+    create(@Body() user: { name: string, email: string, role: 'INTERN' | 'ENGINEER' | 'ADMIN' }) {
+        return this.usersService.create(user)
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() userUpdate: {}) {
-        return { id, ...userUpdate }
+    update(@Param('id') id: string, @Body() userUpdate: { name: string, email: string, role: 'INTERN' | 'ENGINEER' | 'ADMIN' }) {
+        return this.usersService.update(+id, userUpdate)
     }
 
     @Delete(':id')
     deleteById(@Param('id') id: string) {
-        return { id }
+        return this.usersService.delete(+id)
     }
 }
